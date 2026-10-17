@@ -1,4 +1,4 @@
-﻿namespace MiniApi.Models;
+﻿namespace Products.API.Models;
 
 // ── Entidad principal ─────────────────────────
 public record Item

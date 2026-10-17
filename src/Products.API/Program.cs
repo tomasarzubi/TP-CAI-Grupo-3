@@ -1,5 +1,5 @@
-using MiniApi.Data;
-using MiniApi.Extensions;
+using Products.API.Data;
+using Products.API.Extensions;
 
 public partial class Program
 {
@@ -19,8 +19,8 @@ public partial class Program
         using (var scope = app.Services.CreateScope())
             scope.ServiceProvider.GetRequiredService<DatabaseInitializer>().Initialize();
         // Log de ejemplo
-        var logger = app.Services.GetRequiredService<ILogger<Program>>();
-        logger.LogError("OK");
+        //var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        //logger.LogError("OK");
         
         // 4. Middleware (Swagger UI, Serilog, HealthChecks)
         app.UseAppMiddleware(); 
