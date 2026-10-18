@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 
-namespace MiniApi.Middleware
+namespace Products.API.Middleware
 {
     public class AuditMiddleware
     {
@@ -37,7 +37,20 @@ namespace MiniApi.Middleware
             using var memStream = new MemoryStream();
             context.Response.Body = memStream;
 
+            //await _next(context); // ejecutar el endpoint
+//---------------- INICIO AGREGADO
+        try
+            {
             await _next(context); // ejecutar el endpoint
+            }
+        catch
+{
+        //Devolver el stream original antes de que el handler escriba el error
+        context.Response.Body = originalResponseBody;
+        throw;
+}
+//--------------- FIN AGREGADO
+
 
             memStream.Position = 0;
             var responseBody = await new StreamReader(memStream).ReadToEndAsync();
