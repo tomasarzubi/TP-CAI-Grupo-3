@@ -28,11 +28,12 @@ namespace Cart.API.Extensions
 */
 // ------------BASE EDITADA--------------------------------
 
-using Dapper;
 using Cart.API.Data;
 using Cart.API.ExceptionHandlers;
 using Cart.API.HealthChecks;
 using Cart.API.Services;
+using Dapper;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 
 namespace Cart.API.Extensions
 {
@@ -45,9 +46,9 @@ namespace Cart.API.Extensions
 
             services.AddSingleton<DatabaseInitializer>();
             services.AddScoped<CartRepository>();
-            services.AddScoped<ProductService>();      
+            services.AddScoped<CartServices>();
 
-            
+
             services.AddExceptionHandler<NotFoundExceptionHandler>();
             services.AddExceptionHandler<BusinessRuleExceptionHandler>();
             services.AddExceptionHandler<ValidationExceptionHandler>();
