@@ -44,7 +44,7 @@ namespace Cart.API.Extensions
             SqlMapper.AddTypeHandler(new UtcDateTimeTypeHandler());
 
             services.AddSingleton<DatabaseInitializer>();
-            services.AddScoped<ProductRepository>();
+            services.AddScoped<CartRepository>();
             services.AddScoped<ProductService>();      
 
             

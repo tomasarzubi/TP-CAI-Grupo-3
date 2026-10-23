@@ -5,7 +5,7 @@ using Cart.API.Services;
 namespace Cart.API.Extensions.Endpoints
 {
     // ALUMNOS: clase donde se definen los endpoints para cada entidad
-    public static class ProductsEndpointsExtension
+    public static class CartEndpointsExtension
     {
         public static void MapProductEndpoints(this WebApplication app)
         {

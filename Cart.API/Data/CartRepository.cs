@@ -5,11 +5,11 @@ using Cart.API.Models;
 
 namespace Cart.API.Data
 {
-    public class ProductRepository
+    public class CartRepository
     {
         private readonly IConfiguration _config;
 
-        public ProductRepository(IConfiguration config) => _config = config;
+        public CartRepository(IConfiguration config) => _config = config;
 
         private SqliteConnection CreateConnection() =>
             new(_config.GetConnectionString("DefaultConnection") ?? "Data Source=products.db");
