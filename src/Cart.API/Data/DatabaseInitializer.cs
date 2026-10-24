@@ -21,7 +21,7 @@ namespace Cart.API.Data
         {
             var connectionString =
                 _config.GetConnectionString("DefaultConnection")
-                ?? "Data Source=products.db";
+                ?? "Data Source=cart.db";
 
             using var connection = new SqliteConnection(connectionString);
             connection.Open();

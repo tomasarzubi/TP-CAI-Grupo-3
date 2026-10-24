@@ -16,7 +16,7 @@ public class CartRepository
 
     private SqliteConnection CreateConnection() =>
         new(_config.GetConnectionString("DefaultConnection")
-            ?? "Data Source=products.db");
+            ?? "Data Source=cart.db");
 
     // Consultar el carrito de un usuario.
     public async Task<Cart.API.Models.Cart?> GetByUserIdAsync(Guid usuarioId)
