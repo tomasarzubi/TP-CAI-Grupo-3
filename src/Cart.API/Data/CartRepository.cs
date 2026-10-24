@@ -174,6 +174,7 @@ public class CartRepository
     public async Task<bool> ClearAsync(Guid usuarioId)
     {
         using var conn = CreateConnection();
+        await conn.OpenAsync();
 
         var cartId = await conn.QuerySingleOrDefaultAsync<string>("""
             SELECT id

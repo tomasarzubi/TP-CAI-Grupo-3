@@ -1,74 +1,76 @@
 ﻿using Cart.API.DTOs;
-using Cart.API.Models;
 using Cart.API.Services;
+using CartModel = Cart.API.Models.Cart;
 
 namespace Cart.API.Extensions.Endpoints
 {
     // ALUMNOS: clase donde se definen los endpoints para cada entidad
     public static class CartEndpointsExtension
     {
-        public static void MapProductEndpoints(this WebApplication app)
+        public static void MapCartEndpoints(this WebApplication app)
         {
-            // GET all (filtros ?categoria= y ?nombre=)
-            app.MapGet("/api/products", async (string? categoria, string? nombre, ProductService service) =>
+            // GET carrito del usuario
+            app.MapGet("/api/cart/{userId}", async (Guid userId, CartServices service) =>
             {
-                var products = await service.GetAllAsync(categoria, nombre);
-                return Results.Ok(products);
+                var cart = await service.GetAsync(userId);
+                return Results.Ok(cart);
             })
-            .WithTags("Products")
-            .WithSummary("Listar productos")
-            .Produces<IEnumerable<Product>>(200)
-            .ProducesProblem(500);
-
-            // GET by id
-            app.MapGet("/api/products/{id}", async (Guid id, ProductService service) =>
-            {
-                var product = await service.GetByIdAsync(id);
-                return Results.Ok(product);
-            })
-            .WithTags("Products")
-            .WithSummary("Obtener producto por ID")
-            .Produces<Product>(200)
+            .WithTags("Cart")
+            .WithSummary("Obtener carrito del usuario")
+            .Produces<CartModel>(200)
             .ProducesProblem(404)
             .ProducesProblem(500);
 
-            // POST
-            app.MapPost("/api/products", async (CreateProductRequest req, ProductService service) =>
+            // POST agregar item (devuelve 200, no 201, según el contrato)
+            app.MapPost("/api/cart/{userId}/items", async (Guid userId, AddCartItemRequest req, CartServices service) =>
             {
-                var product = await service.CreateAsync(req);
-                return Results.Created($"/api/products/{product.Id}", product);
+                var cart = await service.AddItemAsync(userId, req);
+                return Results.Ok(cart);
             })
-            .WithTags("Products")
-            .WithSummary("Crear nuevo producto")
-            .Produces<Product>(201)
-            .ProducesProblem(400)
-            .ProducesProblem(409)
-            .ProducesProblem(500);
-
-            // PUT
-            app.MapPut("/api/products/{id}", async (Guid id, UpdateProductRequest req, ProductService service) =>
-            {
-                var product = await service.UpdateAsync(id, req);
-                return Results.Ok(product);
-            })
-            .WithTags("Products")
-            .WithSummary("Actualizar producto existente")
-            .Produces<Product>(200)
+            .WithTags("Cart")
+            .WithSummary("Agregar producto al carrito")
+            .Produces<CartModel>(200)
             .ProducesProblem(400)
             .ProducesProblem(404)
+            .ProducesProblem(422)
             .ProducesProblem(500);
 
-            // DELETE
-            app.MapDelete("/api/products/{id}", async (Guid id, ProductService service) =>
+            // PUT actualizar cantidad de un item
+            app.MapPut("/api/cart/{userId}/items/{productId}", async (Guid userId, Guid productId, UpdateCartItemRequest req, CartServices service) =>
             {
-                await service.DeleteAsync(id);
+                var cart = await service.UpdateItemAsync(userId, productId, req);
+                return Results.Ok(cart);
+            })
+            .WithTags("Cart")
+            .WithSummary("Actualizar cantidad de un item")
+            .Produces<CartModel>(200)
+            .ProducesProblem(400)
+            .ProducesProblem(404)
+            .ProducesProblem(422)
+            .ProducesProblem(500);
+
+            // DELETE quitar un item
+            app.MapDelete("/api/cart/{userId}/items/{productId}", async (Guid userId, Guid productId, CartServices service) =>
+            {
+                await service.RemoveItemAsync(userId, productId);
                 return Results.NoContent();
             })
-            .WithTags("Products")
-            .WithSummary("Eliminar producto")
+            .WithTags("Cart")
+            .WithSummary("Quitar un producto del carrito")
             .Produces(204)
             .ProducesProblem(404)
-            .ProducesProblem(409)
+            .ProducesProblem(500);
+
+            // DELETE vaciar carrito
+            app.MapDelete("/api/cart/{userId}", async (Guid userId, CartServices service) =>
+            {
+                await service.ClearAsync(userId);
+                return Results.NoContent();
+            })
+            .WithTags("Cart")
+            .WithSummary("Vaciar carrito completo")
+            .Produces(204)
+            .ProducesProblem(404)
             .ProducesProblem(500);
         }
     }

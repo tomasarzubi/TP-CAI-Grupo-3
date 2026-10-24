@@ -24,7 +24,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
                 detail = "Los datos enviados no son válidos.",
                 instance = context.Request.Path.Value,
                 errorCode = ErrorCodes.CRT_004,
-                errorMessage = "Los datos del producto son inválidos.",
+                errorMessage = "Cantidad inválida.",
                 correlationId = context.TraceIdentifier
             }, cancellationToken: cancellationToken);
             return true;
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
             detail = env.IsDevelopment() ? exception.Message : "Ocurrió un error interno.",
             instance = context.Request.Path.Value,
             errorCode = ErrorCodes.CRT_005,
-            errorMessage = "Error interno al procesar el producto.",
+            errorMessage = "Error interno al procesar el carrito.",
             correlationId = context.TraceIdentifier
         }, cancellationToken: cancellationToken);
         return true;

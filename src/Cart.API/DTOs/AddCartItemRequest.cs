@@ -1,7 +1,11 @@
-﻿namespace Cart.API.DTOs;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Cart.API.DTOs;
 
 public record AddCartItemRequest
 {
     public Guid ProductoId { get; init; }
+
+    [Range(1, int.MaxValue, ErrorMessage = "La cantidad debe ser mayor a 0.")]
     public int Cantidad { get; init; }
 }
