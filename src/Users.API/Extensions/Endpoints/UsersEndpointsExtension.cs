@@ -1,0 +1,42 @@
+﻿using Users.API.DTOs;
+using Users.API.Models;
+using Users.API.Services;
+using Users.API.Exceptions;
+
+namespace Users.API.Extensions.Endpoints
+{
+    public static class UsersEndpointsExtension
+    {
+        public static void MapUserEndpoints(this WebApplication app)
+        {
+            // POST /register
+            app.MapPost("/api/users/register", async (RegisterUserRequest req, UserService service) =>
+            {
+                RequestValidator.Validate(req, ErrorCodes.USR_002);
+                var user = await service.RegisterAsync(req);
+                return Results.Created($"/api/users/{user.Id}", user);
+            })
+            .WithTags("Users")
+            .WithSummary("Registrar nuevo usuario")
+            .Produces<User>(201)
+            .ProducesProblem(400)
+            .ProducesProblem(409)
+            .ProducesProblem(500);
+
+            // POST /login
+            app.MapPost("/api/users/login", async (LoginUserRequest req, UserService service) =>
+            {
+                RequestValidator.Validate(req, ErrorCodes.USR_002);
+                var user = await service.LoginAsync(req);
+                return Results.Ok(user);
+            })
+            .WithTags("Users")
+            .WithSummary("Autenticar usuario")
+            .Produces<User>(200)
+            .ProducesProblem(400)
+            .ProducesProblem(401)
+            .ProducesProblem(403)
+            .ProducesProblem(500);
+        }
+    }
+}
