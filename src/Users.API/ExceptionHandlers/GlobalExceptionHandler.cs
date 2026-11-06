@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics;
-using Products.API.Exceptions;
+using Users.API.Exceptions;
 
-namespace Products.API.ExceptionHandlers;
+namespace Users.API.ExceptionHandlers;
 
 public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHostEnvironment env) : IExceptionHandler
 {
@@ -13,7 +13,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
         if (exception is BadHttpRequestException)
         {
             logger.LogWarning("{ErrorCode} {Endpoint} {CorrelationId}",
-                ErrorCodes.PRD_002, context.Request.Path.Value, context.TraceIdentifier);
+                ErrorCodes.USR_002, context.Request.Path.Value, context.TraceIdentifier);
 
             context.Response.StatusCode = 400;
             await context.Response.WriteAsJsonAsync(new
@@ -23,29 +23,29 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
                 status = 400,
                 detail = "Los datos enviados no son válidos.",
                 instance = context.Request.Path.Value,
-                errorCode = ErrorCodes.PRD_002,
-                errorMessage = "Los datos del producto son inválidos.",
+                errorCode = ErrorCodes.USR_002,
+                errorMessage = "Los datos del usuario son inválidos.",
                 correlationId = context.TraceIdentifier
             }, cancellationToken: cancellationToken);
             return true;
         }
 
         // Error inesperado: se loguea con el stack, pero no se expone al cliente
-        logger.LogError(exception, "{ErrorCode} {Endpoint} {CorrelationId}",
-            ErrorCodes.PRD_005, context.Request.Path.Value, context.TraceIdentifier);
+      logger.LogError(exception, "{ErrorCode} {Endpoint} {CorrelationId}",
+    ErrorCodes.USR_006, context.Request.Path.Value, context.TraceIdentifier);
 
-        context.Response.StatusCode = 500;
-        await context.Response.WriteAsJsonAsync(new
-        {
-            type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
-            title = "Internal Server Error",
-            status = 500,
-            detail = env.IsDevelopment() ? exception.Message : "Ocurrió un error interno.",
-            instance = context.Request.Path.Value,
-            errorCode = ErrorCodes.PRD_005,
-            errorMessage = "Error interno al procesar el producto.",
-            correlationId = context.TraceIdentifier
-        }, cancellationToken: cancellationToken);
+context.Response.StatusCode = 500;
+await context.Response.WriteAsJsonAsync(new
+{
+    type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+    title = "Internal Server Error",
+    status = 500,
+    detail = env.IsDevelopment() ? exception.Message : "Ocurrió un error interno.",
+    instance = context.Request.Path.Value,
+    errorCode = ErrorCodes.USR_006,
+    errorMessage = "Error interno al procesar el usuario.",
+    correlationId = context.TraceIdentifier
+}, cancellationToken: cancellationToken);
         return true;
     }
 }

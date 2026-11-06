@@ -1,7 +1,7 @@
 ﻿using Users.API.DTOs;
 using Users.API.Models;
-using Users.API.Services;
 using Users.API.Exceptions;
+using Users.API.Services;
 
 namespace Users.API.Extensions.Endpoints
 {
@@ -12,8 +12,8 @@ namespace Users.API.Extensions.Endpoints
             // POST /register
             app.MapPost("/api/users/register", async (RegisterUserRequest req, UserService service) =>
             {
-                RequestValidator.Validate(req, ErrorCodes.USR_002);
-                var user = await service.RegisterAsync(req);
+RequestValidator.Validate(req, ErrorCodes.USR_002);               
+ var user = await service.RegisterAsync(req);
                 return Results.Created($"/api/users/{user.Id}", user);
             })
             .WithTags("Users")
@@ -26,8 +26,8 @@ namespace Users.API.Extensions.Endpoints
             // POST /login
             app.MapPost("/api/users/login", async (LoginUserRequest req, UserService service) =>
             {
-                RequestValidator.Validate(req, ErrorCodes.USR_002);
-                var user = await service.LoginAsync(req);
+RequestValidator.Validate(req, ErrorCodes.USR_002);                
+var user = await service.LoginAsync(req);
                 return Results.Ok(user);
             })
             .WithTags("Users")

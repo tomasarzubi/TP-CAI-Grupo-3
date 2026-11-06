@@ -1,4 +1,4 @@
-namespace Products.API.Exceptions;
+namespace Users.API.Exceptions;
 
 public class NotFoundException(string errorCode, string message) : Exception(message)
 {

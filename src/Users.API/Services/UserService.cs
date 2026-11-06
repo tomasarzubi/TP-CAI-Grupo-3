@@ -1,51 +1,85 @@
-using Products.API.Data;
-using Products.API.DTOs;
-using Products.API.Exceptions;
-using Products.API.Models;
+using Users.API.Data;
+using Users.API.DTOs;
+using Users.API.Exceptions;
+using Users.API.Models;
 
-namespace Products.API.Services;
-
-public class ProductService(ProductRepository repo)
+namespace Users.API.Services
 {
-    public Task<IEnumerable<Product>> GetAllAsync(string? categoria, string? nombre)
-        => repo.GetAllAsync(categoria, nombre);
-
-    public async Task<Product> GetByIdAsync(Guid id)
+    public class UserService
     {
-        var product = await repo.GetByIdAsync(id);
-        if (product == null)
-            throw new NotFoundException(ErrorCodes.PRD_001, "Producto no encontrado.");
-        return product;
+        private readonly UserRepository _repository;
+
+        public UserService(UserRepository repository)
+        {
+            _repository = repository;
+        }
+
+        public async Task<User> RegisterAsync(RegisterUserRequest req)
+        {
+            // verifico si el mail ya existe
+            var existe = await _repository.GetByEmailAsync(req.Email);
+            if (existe != null)
+            {
+                throw new BusinessRuleException("USR-001", $"El email '{req.Email}' ya está registrado.");
+            }
+
+            // armo el usuario nuevo
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                Nombre = req.Nombre,
+                Apellido = req.Apellido,
+                Email = req.Email,
+                PasswordHash = req.Password, // TODO: en la vida real esto se hashea
+                FechaRegistro = DateTime.UtcNow,
+                Activo = true,
+                IntentosFallidos = 0
+            };
+
+            await _repository.CreateAsync(user);
+
+            // por seguridad, el TP pide no devolver nunca el password
+            user.PasswordHash = ""; 
+            return user;
+        }
+public async Task<User> LoginAsync(LoginUserRequest req)
+{
+    var user = await _repository.GetByEmailAsync(req.Email);
+
+    // 1. Usuario no existe -> 401 Unauthorized (USR-003)
+    if (user == null)
+    {
+        throw new BusinessRuleException("USR-003", "Credenciales incorrectas.", statusCode: 401);
     }
 
-    public async Task<Product> CreateAsync(CreateProductRequest request)
+    // 2. Cuenta bloqueada -> 403 Forbidden (USR-004 / USR-005)
+    if (!user.Activo)
     {
-        RequestValidator.Validate(request, ErrorCodes.PRD_002);
-
-        if (await repo.ExistsByNombreCategoriaAsync(request.Nombre, request.Categoria))
-            throw new BusinessRuleException(ErrorCodes.PRD_003,
-                $"Ya existe un producto con ese nombre en la categoría '{request.Categoria}'.");
-
-        return await repo.CreateAsync(request);
+        if (user.IntentosFallidos >= 3)
+            throw new BusinessRuleException("USR-004", "Usuario bloqueado por demasiados intentos fallidos.", statusCode: 403);
+        else
+            throw new BusinessRuleException("USR-005", "Usuario bloqueado por detección de fraude.", statusCode: 403);
     }
 
-    public async Task<Product> UpdateAsync(Guid id, UpdateProductRequest request)
+    // 3. Contraseña incorrecta -> 401 Unauthorized (USR-003)
+    if (user.PasswordHash != req.Password)
     {
-        RequestValidator.Validate(request, ErrorCodes.PRD_002);
-
-        var updated = await repo.UpdateAsync(id, request);
-        if (!updated)
-            throw new NotFoundException(ErrorCodes.PRD_001, "Producto no encontrado.");
-
-        return (await repo.GetByIdAsync(id))!;
+        user.IntentosFallidos++;
+        
+        if (user.IntentosFallidos >= 3)
+        {
+            user.Activo = false;
+        }
+        
+        await _repository.UpdateAsync(user);
+        throw new BusinessRuleException("USR-003", "Credenciales incorrectas.", statusCode: 401);
     }
 
-    public async Task DeleteAsync(Guid id)
-    {
-        await GetByIdAsync(id); // lanza PRD-001 si no existe
+    user.IntentosFallidos = 0;
+    await _repository.UpdateAsync(user);
 
-        // PRD-004 (órdenes activas) se agrega en la Parte 2: requiere consultar Orders.API
-
-        await repo.DeleteAsync(id);
+    user.PasswordHash = ""; 
+    return user;
+    }
     }
 }

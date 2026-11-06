@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Products.API.Services;
+namespace Users.API.Services;
 
 public static class RequestValidator
 {
