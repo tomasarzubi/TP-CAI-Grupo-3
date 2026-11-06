@@ -16,14 +16,25 @@ namespace Users.API.Services
 
         public async Task<User> RegisterAsync(RegisterUserRequest req)
         {
-            // verifico si el mail ya existe
+            // 1. Validacion de datos de entrada (REQ-03 -> USR-002)
+            if (req == null ||
+                string.IsNullOrWhiteSpace(req.Nombre) ||
+                string.IsNullOrWhiteSpace(req.Apellido) ||
+                string.IsNullOrWhiteSpace(req.Email) ||
+                string.IsNullOrWhiteSpace(req.Password) ||
+                !req.Email.Contains("@"))
+            {
+                throw new BusinessRuleException("USR-002", "Los datos del usuario son inválidos.", statusCode: 400);
+            }
+
+            // 2. Verifico si el mail ya existe
             var existe = await _repository.GetByEmailAsync(req.Email);
             if (existe != null)
             {
-                throw new BusinessRuleException("USR-001", $"El email '{req.Email}' ya está registrado.");
+                throw new BusinessRuleException("USR-001", $"El email '{req.Email}' ya está registrado.", statusCode: 409);
             }
 
-            // armo el usuario nuevo
+            // 3. Armo el usuario nuevo
             var user = new User
             {
                 Id = Guid.NewGuid(),
@@ -38,48 +49,55 @@ namespace Users.API.Services
 
             await _repository.CreateAsync(user);
 
-            // por seguridad, el TP pide no devolver nunca el password
+            // Por seguridad, el TP pide no devolver nunca el password
             user.PasswordHash = ""; 
             return user;
         }
-public async Task<User> LoginAsync(LoginUserRequest req)
-{
-    var user = await _repository.GetByEmailAsync(req.Email);
 
-    // 1. Usuario no existe -> 401 Unauthorized (USR-003)
-    if (user == null)
-    {
-        throw new BusinessRuleException("USR-003", "Credenciales incorrectas.", statusCode: 401);
-    }
-
-    // 2. Cuenta bloqueada -> 403 Forbidden (USR-004 / USR-005)
-    if (!user.Activo)
-    {
-        if (user.IntentosFallidos >= 3)
-            throw new BusinessRuleException("USR-004", "Usuario bloqueado por demasiados intentos fallidos.", statusCode: 403);
-        else
-            throw new BusinessRuleException("USR-005", "Usuario bloqueado por detección de fraude.", statusCode: 403);
-    }
-
-    // 3. Contraseña incorrecta -> 401 Unauthorized (USR-003)
-    if (user.PasswordHash != req.Password)
-    {
-        user.IntentosFallidos++;
-        
-        if (user.IntentosFallidos >= 3)
+        public async Task<User> LoginAsync(LoginUserRequest req)
         {
-            user.Activo = false;
+            // Validacion de datos de entrada en login
+            if (req == null || string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Password))
+            {
+                throw new BusinessRuleException("USR-002", "Los datos del usuario son inválidos.", statusCode: 400);
+            }
+
+            var user = await _repository.GetByEmailAsync(req.Email);
+
+            // 1. Usuario no existe -> 401 Unauthorized (USR-003)
+            if (user == null)
+            {
+                throw new BusinessRuleException("USR-003", "Credenciales incorrectas.", statusCode: 401);
+            }
+
+            // 2. Cuenta bloqueada -> 403 Forbidden (USR-004 / USR-005)
+            if (!user.Activo)
+            {
+                if (user.IntentosFallidos >= 3)
+                    throw new BusinessRuleException("USR-004", "Usuario bloqueado por demasiados intentos fallidos.", statusCode: 403);
+                else
+                    throw new BusinessRuleException("USR-005", "Usuario bloqueado por detección de fraude.", statusCode: 403);
+            }
+
+            // 3. Contraseña incorrecta -> 401 Unauthorized (USR-003)
+            if (user.PasswordHash != req.Password)
+            {
+                user.IntentosFallidos++;
+                
+                if (user.IntentosFallidos >= 3)
+                {
+                    user.Activo = false;
+                }
+                
+                await _repository.UpdateAsync(user);
+                throw new BusinessRuleException("USR-003", "Credenciales incorrectas.", statusCode: 401);
+            }
+
+            user.IntentosFallidos = 0;
+            await _repository.UpdateAsync(user);
+
+            user.PasswordHash = ""; 
+            return user;
         }
-        
-        await _repository.UpdateAsync(user);
-        throw new BusinessRuleException("USR-003", "Credenciales incorrectas.", statusCode: 401);
-    }
-
-    user.IntentosFallidos = 0;
-    await _repository.UpdateAsync(user);
-
-    user.PasswordHash = ""; 
-    return user;
-    }
     }
 }

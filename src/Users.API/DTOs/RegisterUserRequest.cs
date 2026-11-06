@@ -1,19 +1,18 @@
 using System.ComponentModel.DataAnnotations;
 //se agregaron validaciones
-namespace Users.API.DTOs
-{
-    public record RegisterUserRequest(
-        [Required(ErrorMessage = "El nombre es obligatorio.")] 
-        string Nombre,
+namespace Users.API.DTOs;
 
-        [Required(ErrorMessage = "El apellido es obligatorio.")] 
-        string Apellido,
+public record RegisterUserRequest(
+    [Required(ErrorMessage = "El nombre es requerido.")] 
+    string Nombre,
 
-        [Required(ErrorMessage = "El email es obligatorio.")] 
-        [EmailAddress(ErrorMessage = "El formato del email no es válido.")] 
-        string Email,
+    [Required(ErrorMessage = "El apellido es requerido.")] 
+    string Apellido,
 
-        [Required(ErrorMessage = "La contraseña es obligatoria.")] 
-        string Password
-    );
-}
+    [Required(ErrorMessage = "El email es requerido.")]
+    [EmailAddress(ErrorMessage = "El formato de email es inválido.")] 
+    string Email,
+
+    [Required(ErrorMessage = "La contraseña es requerida.")] 
+    string Password
+);
