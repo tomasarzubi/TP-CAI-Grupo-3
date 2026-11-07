@@ -1,5 +1,5 @@
-using Products.API.Data;
-using Products.API.Extensions;
+using Users.API.Data;
+using Users.API.Extensions;
 
 public partial class Program
 {

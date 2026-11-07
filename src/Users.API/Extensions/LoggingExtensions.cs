@@ -3,7 +3,7 @@ using Serilog.Events;
 using Serilog.Filters;
 using Serilog.Formatting.Json;
 
-namespace Products.API.Extensions
+namespace Users.API.Extensions
 {
     public static class LoggingExtensions
     {
@@ -14,7 +14,7 @@ namespace Products.API.Extensions
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", LogEventLevel.Information)
                 .Enrich.FromLogContext()
-                .Enrich.WithProperty("Servicio", "Products.API")                      
+                .Enrich.WithProperty("Servicio", "Users.API")                      
 
              
                 .WriteTo.Console(outputTemplate:
