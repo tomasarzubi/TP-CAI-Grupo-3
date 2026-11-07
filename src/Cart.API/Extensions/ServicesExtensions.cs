@@ -32,6 +32,7 @@ using Cart.API.Data;
 using Cart.API.ExceptionHandlers;
 using Cart.API.HealthChecks;
 using Cart.API.Services;
+using Cart.API.Clients;
 using Dapper;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 
@@ -47,7 +48,14 @@ namespace Cart.API.Extensions
             services.AddSingleton<DatabaseInitializer>();
             services.AddScoped<CartRepository>();
             services.AddScoped<CartServices>();
-
+            services.AddHttpContextAccessor();
+            services.AddTransient<CorrelationIdHandler>();
+            services.AddHttpClient<ProductsClient>((sp, client) =>
+            {
+                var config = sp.GetRequiredService<IConfiguration>();
+                client.BaseAddress = new Uri(config["Services:ProductsApi:BaseUrl"] ?? "http://localhost:5112");
+                client.Timeout = TimeSpan.FromSeconds(5);
+            }).AddHttpMessageHandler<CorrelationIdHandler>();
 
             services.AddExceptionHandler<NotFoundExceptionHandler>();
             services.AddExceptionHandler<BusinessRuleExceptionHandler>();
