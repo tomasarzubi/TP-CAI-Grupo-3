@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics;
-using Products.API.Exceptions;
+using Users.API.Exceptions;
 
-namespace Products.API.ExceptionHandlers;
+namespace Users.API.ExceptionHandlers;
 
 public class NotFoundExceptionHandler(ILogger<NotFoundExceptionHandler> logger) : IExceptionHandler
 {

@@ -2,7 +2,7 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace Products.API.HealthChecks
+namespace Users.API.HealthChecks
 {
     public class SqliteHealthCheck : IHealthCheck
     {
@@ -17,7 +17,7 @@ namespace Products.API.HealthChecks
             try
             {
                 var connectionString = _config.GetConnectionString("DefaultConnection")
-                    ?? "Data Source=products.db";
+                    ?? "Data Source=users.db";
 
                 using var conn = new SqliteConnection(connectionString);
                 await conn.OpenAsync(cancellationToken);

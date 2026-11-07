@@ -2,7 +2,7 @@ using System.Data;
 using System.Globalization;
 using Dapper;
 
-namespace Products.API.Data;
+namespace Users.API.Data;
 
 public class GuidTypeHandler : SqlMapper.TypeHandler<Guid>
 {

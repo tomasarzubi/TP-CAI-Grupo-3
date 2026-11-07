@@ -1,4 +1,4 @@
-namespace Products.API.Exceptions;
+namespace Users.API.Exceptions;
 
 public class BusinessRuleException(string errorCode, string message, int statusCode = 409) : Exception(message)
 {

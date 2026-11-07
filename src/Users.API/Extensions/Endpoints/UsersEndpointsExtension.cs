@@ -1,74 +1,41 @@
-﻿using Products.API.DTOs;
-using Products.API.Models;
-using Products.API.Services;
+﻿using Users.API.DTOs;
+using Users.API.Models;
+using Users.API.Exceptions;
+using Users.API.Services;
 
-namespace Products.API.Extensions.Endpoints
+namespace Users.API.Extensions.Endpoints
 {
-    // ALUMNOS: clase donde se definen los endpoints para cada entidad
-    public static class ProductsEndpointsExtension
+    public static class UsersEndpointsExtension
     {
-        public static void MapProductEndpoints(this WebApplication app)
+        public static void MapUserEndpoints(this WebApplication app)
         {
-            // GET all (filtros ?categoria= y ?nombre=)
-            app.MapGet("/api/products", async (string? categoria, string? nombre, ProductService service) =>
+            // POST /register
+            app.MapPost("/api/users/register", async (RegisterUserRequest req, UserService service) =>
             {
-                var products = await service.GetAllAsync(categoria, nombre);
-                return Results.Ok(products);
+RequestValidator.Validate(req, ErrorCodes.USR_002);               
+ var user = await service.RegisterAsync(req);
+                return Results.Created($"/api/users/{user.Id}", user);
             })
-            .WithTags("Products")
-            .WithSummary("Listar productos")
-            .Produces<IEnumerable<Product>>(200)
-            .ProducesProblem(500);
-
-            // GET by id
-            app.MapGet("/api/products/{id}", async (Guid id, ProductService service) =>
-            {
-                var product = await service.GetByIdAsync(id);
-                return Results.Ok(product);
-            })
-            .WithTags("Products")
-            .WithSummary("Obtener producto por ID")
-            .Produces<Product>(200)
-            .ProducesProblem(404)
-            .ProducesProblem(500);
-
-            // POST
-            app.MapPost("/api/products", async (CreateProductRequest req, ProductService service) =>
-            {
-                var product = await service.CreateAsync(req);
-                return Results.Created($"/api/products/{product.Id}", product);
-            })
-            .WithTags("Products")
-            .WithSummary("Crear nuevo producto")
-            .Produces<Product>(201)
+            .WithTags("Users")
+            .WithSummary("Registrar nuevo usuario")
+            .Produces<User>(201)
             .ProducesProblem(400)
             .ProducesProblem(409)
             .ProducesProblem(500);
 
-            // PUT
-            app.MapPut("/api/products/{id}", async (Guid id, UpdateProductRequest req, ProductService service) =>
+            // POST /login
+            app.MapPost("/api/users/login", async (LoginUserRequest req, UserService service) =>
             {
-                var product = await service.UpdateAsync(id, req);
-                return Results.Ok(product);
+RequestValidator.Validate(req, ErrorCodes.USR_002);                
+var user = await service.LoginAsync(req);
+                return Results.Ok(user);
             })
-            .WithTags("Products")
-            .WithSummary("Actualizar producto existente")
-            .Produces<Product>(200)
+            .WithTags("Users")
+            .WithSummary("Autenticar usuario")
+            .Produces<User>(200)
             .ProducesProblem(400)
-            .ProducesProblem(404)
-            .ProducesProblem(500);
-
-            // DELETE
-            app.MapDelete("/api/products/{id}", async (Guid id, ProductService service) =>
-            {
-                await service.DeleteAsync(id);
-                return Results.NoContent();
-            })
-            .WithTags("Products")
-            .WithSummary("Eliminar producto")
-            .Produces(204)
-            .ProducesProblem(404)
-            .ProducesProblem(409)
+            .ProducesProblem(401)
+            .ProducesProblem(403)
             .ProducesProblem(500);
         }
     }

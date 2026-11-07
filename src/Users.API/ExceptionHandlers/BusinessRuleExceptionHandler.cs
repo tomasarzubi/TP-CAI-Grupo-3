@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics;
-using Products.API.Exceptions;
+using Users.API.Exceptions;
 
-namespace Products.API.ExceptionHandlers;
+namespace Users.API.ExceptionHandlers;
 
 public class BusinessRuleExceptionHandler(ILogger<BusinessRuleExceptionHandler> logger) : IExceptionHandler
 {
@@ -16,6 +16,8 @@ public class BusinessRuleExceptionHandler(ILogger<BusinessRuleExceptionHandler> 
 
         var (type, title, detail) = ex.StatusCode switch
         {
+            401 => ("https://tools.ietf.org/html/rfc7235#section-3.1", "Unauthorized", "Las credenciales no son válidas."),
+            403 => ("https://tools.ietf.org/html/rfc7231#section-6.5.3", "Forbidden", "El acceso está prohibido."),
             422 => ("https://tools.ietf.org/html/rfc4918#section-11.2", "Unprocessable Entity", "No se puede procesar la solicitud."),
             400 => ("https://tools.ietf.org/html/rfc7231#section-6.5.1", "Bad Request", "La solicitud no es válida."),
             _   => ("https://tools.ietf.org/html/rfc7231#section-6.5.9", "Conflict", "No se puede completar la operación por un conflicto.")
@@ -33,6 +35,7 @@ public class BusinessRuleExceptionHandler(ILogger<BusinessRuleExceptionHandler> 
             errorMessage = ex.Message,
             correlationId = context.TraceIdentifier
         }, cancellationToken: cancellationToken);
+
         return true;
     }
 }

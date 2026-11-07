@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 
-namespace Products.API.Middleware
+namespace Users.API.Middleware
 {
     public class AuditMiddleware
     {

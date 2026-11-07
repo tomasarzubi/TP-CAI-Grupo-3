@@ -1,12 +1,16 @@
-namespace Products.API.Models;
+using System;
 
-public record Product
+namespace Users.API.Models
 {
-    public Guid Id { get; init; }
-    public string Nombre { get; init; } = string.Empty;
-    public string? Descripcion { get; init; }
-    public decimal Precio { get; init; }
-    public int Stock { get; init; }
-    public string Categoria { get; init; } = string.Empty;
-    public DateTime FechaCreacion { get; init; }
+    public class User
+    {
+        public Guid Id { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido { get; set; }
+        public string Email { get; set; }
+        public string PasswordHash { get; set; }
+        public DateTime FechaRegistro { get; set; }
+        public bool Activo { get; set; }
+        public int IntentosFallidos { get; set; }
+    }
 }
