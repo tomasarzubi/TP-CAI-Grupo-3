@@ -53,7 +53,15 @@ namespace Users.API.Services
             user.PasswordHash = ""; 
             return user;
         }
-
+        public async Task<User> GetByIdAsync(Guid id)
+        {
+            var user = await _repository.GetByIdAsync(id);
+            if (user == null)
+            {
+                throw new BusinessRuleException("USR-007", "Usuario no encontrado.", statusCode: 404); //Aunque no esta en la consgna, se agrego el error de Usuario no encontrado
+            }
+            return user;
+        }
         public async Task<User> LoginAsync(LoginUserRequest req)
         {
             // Validacion de datos de entrada en login
