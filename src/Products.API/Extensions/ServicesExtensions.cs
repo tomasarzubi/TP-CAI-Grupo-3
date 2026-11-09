@@ -45,7 +45,8 @@ namespace Products.API.Extensions
 
             services.AddSingleton<DatabaseInitializer>();
             services.AddScoped<ProductRepository>();
-            services.AddScoped<ProductService>();      
+            services.AddScoped<ProductService>();
+            services.AddHttpClient<OrdersClient>(client => client.BaseAddress = new Uri("http://localhost:5104"));      
 
             
             services.AddExceptionHandler<NotFoundExceptionHandler>();
