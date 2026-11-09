@@ -2,11 +2,14 @@
 [Bb]in/
 [Oo]bj/
 [Tt]emp/
-[Ll]oggit /
 .idea/
 .vs/
 *.user
-products.db
 *.pdb
 logs/
 *.log
+
+# Bases de datos SQLite y sus archivos temporales
+*.db
+*.db-shm
+*.db-wal
