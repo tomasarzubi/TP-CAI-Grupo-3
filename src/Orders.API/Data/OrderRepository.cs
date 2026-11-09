@@ -39,18 +39,18 @@ namespace Orders.API.Data
                 SELECT id, usuario_id AS UsuarioId, total, estado,
                 fecha_creacion AS FechaCreacion
                 FROM orders
-                WHERE (@filtro IS NULL OR usuario_id = @filtro)
+                WHERE (@filtro IS NULL OR usuario_id = @filtro COLLATE NOCASE)
                 ORDER BY fecha_creacion DESC
-            """, new { filtro })).ToList();
+            """, new { filtro })).ToList();   // <- CAMBIO 1: COLLATE NOCASE
 
             var items = (await conn.QueryAsync<ItemRow>("""
                 SELECT i.order_id AS OrderId, i.producto_id AS ProductoId,
                 i.cantidad AS Cantidad, i.precio_unitario AS PrecioUnitario
                 FROM order_items i
                 JOIN orders o ON o.id = i.order_id
-                WHERE (@filtro IS NULL OR o.usuario_id = @filtro)
+                WHERE (@filtro IS NULL OR o.usuario_id = @filtro COLLATE NOCASE)
                 ORDER BY i.rowid
-            """, new { filtro })).ToLookup(r => r.OrderId);
+            """, new { filtro })).ToLookup(r => r.OrderId);   // <- CAMBIO 2: COLLATE NOCASE
 
             return orders.Select(o => o with { Items = items[o.Id].Select(ToItem).ToList() });
         }
