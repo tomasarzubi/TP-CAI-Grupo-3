@@ -5,7 +5,9 @@ using Products.API.Models;
 
 namespace Products.API.Services;
 
-public class ProductService(ProductRepository repo)
+// class ProductService(ProductRepository repo)
+
+public class ProductService(ProductRepository repo, OrdersClient orders)
 {
     public Task<IEnumerable<Product>> GetAllAsync(string? categoria, string? nombre)
         => repo.GetAllAsync(categoria, nombre);
@@ -44,7 +46,9 @@ public class ProductService(ProductRepository repo)
     {
         await GetByIdAsync(id); // lanza PRD-001 si no existe
 
-        // PRD-004 (órdenes activas) se agrega en la Parte 2: requiere consultar Orders.API
+        if (await orders.TieneOrdenesActivasAsync(id))
+    throw new BusinessRuleException(ErrorCodes.PRD_004,
+        "El producto tiene órdenes activas y no puede eliminarse.");
 
         await repo.DeleteAsync(id);
     }
