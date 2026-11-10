@@ -37,6 +37,22 @@ var user = await service.LoginAsync(req);
             .ProducesProblem(401)
             .ProducesProblem(403)
             .ProducesProblem(500);
+
+                        // GET /api/users/{id}
+            app.MapGet("/api/users/{id:guid}", async (Guid id, UserService service) =>
+            {
+                var user = await service.GetByIdAsync(id);
+
+                if (user == null)
+                    return Results.NotFound();
+
+                return Results.Ok(user);
+            })
+            .WithTags("Users")
+            .WithSummary("Buscar usuario por ID")
+            .Produces<User>(200)
+            .ProducesProblem(404)
+            .ProducesProblem(500);
         }
     }
 }

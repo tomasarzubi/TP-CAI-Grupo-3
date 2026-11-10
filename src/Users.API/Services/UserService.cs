@@ -53,7 +53,18 @@ namespace Users.API.Services
             user.PasswordHash = ""; 
             return user;
         }
+        public async Task<User?> GetByIdAsync(Guid id)
+        {
+            var user = await _repository.GetByIdAsync(id);
 
+            if (user == null)
+                return null;
+
+            // Por seguridad, nunca devolver la contraseña
+            user.PasswordHash = "";
+
+            return user;
+        }
         public async Task<User> LoginAsync(LoginUserRequest req)
         {
             // Validacion de datos de entrada en login

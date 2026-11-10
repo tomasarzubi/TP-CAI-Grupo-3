@@ -1,14 +1,7 @@
 namespace Notifications.API.Exceptions;
 
-public class BusinessRuleException : Exception
+public class BusinessRuleException(string errorCode, string message, int statusCode = 409) : Exception(message)
 {
-    public string ErrorCode { get; }
-    public int StatusCode { get; }
-
-    public BusinessRuleException(string errorCode, string message, int statusCode = 400) 
-        : base(message)
-    {
-        ErrorCode = errorCode;
-        StatusCode = statusCode;
-    }
+    public string ErrorCode { get; } = errorCode;
+    public int StatusCode { get; } = statusCode;
 }

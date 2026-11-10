@@ -1,26 +1,37 @@
+
 using Notifications.API.DTOs;
 using Notifications.API.Services;
 
-namespace Notifications.API.Endpoints;
-
-public static class NotificationEndpoints
+namespace Notifications.API.Endpoints
 {
-    public static void MapNotificationEndpoints(this IEndpointRouteBuilder app)
+    public static class NotificationEndpoints
     {
-        var group = app.MapGroup("/api/notifications").WithTags("Notifications");
-
-        // POST /api/notifications/send -> 201 Created
-        group.MapPost("/send", async (SendNotificationRequest request, NotificationService service) =>
+        public static void MapNotificationEndpoints(this WebApplication app)
         {
-            var result = await service.SendAsync(request);
-            return Results.Created($"/api/notifications/{result.UsuarioId}", result);
-        });
+            // POST: enviar notificación
+            app.MapPost("/api/notifications/send", async (SendNotificationRequest req, NotificationService service) =>
+            {
+                var notification = await service.SendAsync(req);
+                return Results.Created($"/api/notifications/{notification.UsuarioId}", notification);
+            })
+            .WithTags("Notifications")
+            .WithSummary("Registrar y simular envío de notificación")
+            .Produces<NotificationResponse>(201)
+            .ProducesProblem(400)
+            .ProducesProblem(404)
+            .ProducesProblem(500);
 
-        // GET /api/notifications/{userId} -> 200 OK
-        group.MapGet("/{userId:guid}", async (Guid userId, NotificationService service) =>
-        {
-            var result = await service.GetByUserIdAsync(userId);
-            return Results.Ok(result);
-        });
+            // GET: obtener notificaciones por usuario
+            app.MapGet("/api/notifications/{userId:guid}", async (Guid userId, NotificationService service) =>
+            {
+                var notifications = await service.GetByUserIdAsync(userId);
+                return Results.Ok(notifications);
+            })
+            .WithTags("Notifications")
+            .WithSummary("Listar notificaciones de un usuario")
+            .Produces<List<NotificationResponse>>(200)
+            .ProducesProblem(404)
+            .ProducesProblem(500);
+        }
     }
 }

@@ -3,45 +3,26 @@ using Notifications.API.Exceptions;
 
 namespace Notifications.API.Services;
 
-public class NotificationService
+public class NotificationService(UsersClient users)
 {
     private static readonly List<NotificationResponse> _notificationsDb = new();
 
-// constructor para usar HttpClient
-    private readonly HttpClient _httpClient;
-
-    public NotificationService(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
     public async Task<NotificationResponse> SendAsync(SendNotificationRequest req)
     {
-        // Validacion REQ-03 -> NTF-002 (400 Bad Request)
-        if (req == null || string.IsNullOrWhiteSpace(req.Mensaje) ||
+        // NTF-002 (400): campos faltantes o tipo no reconocido
+        if (req == null || req.UsuarioId == Guid.Empty ||
+            string.IsNullOrWhiteSpace(req.Mensaje) ||
             (req.Tipo != "Email" && req.Tipo != "Push" && req.Tipo != "SMS"))
         {
-            throw new BusinessRuleException("NTF-002", "Los datos de la notificación son inválidos.", statusCode: 400);
+            throw new ValidationException(ErrorCodes.NTF_002,
+                "Los datos de la notificación son inválidos.");
         }
 
-        // Validacion de Usuario -> NTF-001 (404 Not Found)
+        // NTF-001 (404): el usuario no existe en Users.API
+        if (!await users.ExistsAsync(req.UsuarioId))
+            throw new NotFoundException(ErrorCodes.NTF_001,
+                "El usuario destinatario no fue encontrado.");
 
-    
-        if (req.UsuarioId == Guid.Empty)
-        {
-            throw new BusinessRuleException("NTF-001", "El usuario destinatario no fue encontrado.", statusCode: 404);
-        }
-
-        // Hacemos la consulta al microservicio de Usuarios. 
-    
-        var response = await _httpClient.GetAsync($"/api/users/{req.UsuarioId}");
-
-        if (!response.IsSuccessStatusCode)
-        {
-            // Si devuelve 404 Not Found, lanzamos tu excepción formateada
-            throw new BusinessRuleException("NTF-001", "El usuario destinatario no fue encontrado.", statusCode: 404);
-        }
-
-        
         var notification = new NotificationResponse(
             Guid.NewGuid(),
             req.UsuarioId,
@@ -52,19 +33,24 @@ public class NotificationService
         );
 
         _notificationsDb.Add(notification);
-
         return notification;
     }
 
-    public async Task<List<NotificationResponse>> GetByUserIdAsync(Guid userId)
+    public Task<List<NotificationResponse>> GetByUserIdAsync(Guid userId)
     {
-        var userNotifications = _notificationsDb.Where(n => n.UsuarioId == userId).ToList();
+        var resultado = new List<NotificationResponse>();
 
-        if (!userNotifications.Any())
+        foreach (var n in _notificationsDb)
         {
-            throw new BusinessRuleException("NTF-003", "No se encontraron notificaciones para el usuario.", statusCode: 404);
+            if (n.UsuarioId == userId)
+                resultado.Add(n);
         }
 
-        return await Task.FromResult(userNotifications);
+        // NTF-003 (404): el usuario no tiene notificaciones
+        if (resultado.Count == 0)
+            throw new NotFoundException(ErrorCodes.NTF_003,
+                "No se encontraron notificaciones para el usuario.");
+
+        return Task.FromResult(resultado);
     }
 }
