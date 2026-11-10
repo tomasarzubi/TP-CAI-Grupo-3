@@ -9,7 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Products.API", "src\Product
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Users.API", "src\Users.API\Users.API.csproj", "{518D0C28-C07B-4FF9-89A6-A16CE385D71A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.API", "src\Notifications.API\Notifications.API.csproj", "{F1F2539E-A2F7-4B56-9BAE-2B869E2DFE9D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cart.API", "src\Cart.API\Cart.API.csproj", "{D9D82999-22B1-4525-8EB9-287C7360F20C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orders.API", "src\Orders.API\Orders.API.csproj", "{F7A64662-8620-48B9-BC81-94DDC23FA4FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifications.API", "src\Notifications.API\Notifications.API.csproj", "{0FC1EBC8-22FB-400C-901A-DD91A1D56F37}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notificaciones.API", "Notificaciones.API", "{EFAFB01F-037E-6B99-7B53-CA098BC31E3A}"
 EndProject
