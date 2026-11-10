@@ -7,6 +7,13 @@ public class NotificationService
 {
     private static readonly List<NotificationResponse> _notificationsDb = new();
 
+// constructor para usar HttpClient
+    private readonly HttpClient _httpClient;
+
+    public NotificationService(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
     public async Task<NotificationResponse> SendAsync(SendNotificationRequest req)
     {
         // Validacion REQ-03 -> NTF-002 (400 Bad Request)
@@ -17,11 +24,24 @@ public class NotificationService
         }
 
         // Validacion de Usuario -> NTF-001 (404 Not Found)
+
+    
         if (req.UsuarioId == Guid.Empty)
         {
             throw new BusinessRuleException("NTF-001", "El usuario destinatario no fue encontrado.", statusCode: 404);
         }
 
+        // Hacemos la consulta al microservicio de Usuarios. 
+    
+        var response = await _httpClient.GetAsync($"/api/users/{req.UsuarioId}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            // Si devuelve 404 Not Found, lanzamos tu excepción formateada
+            throw new BusinessRuleException("NTF-001", "El usuario destinatario no fue encontrado.", statusCode: 404);
+        }
+
+        
         var notification = new NotificationResponse(
             Guid.NewGuid(),
             req.UsuarioId,
@@ -32,7 +52,8 @@ public class NotificationService
         );
 
         _notificationsDb.Add(notification);
-        return await Task.FromResult(notification);
+
+        return notification;
     }
 
     public async Task<List<NotificationResponse>> GetByUserIdAsync(Guid userId)

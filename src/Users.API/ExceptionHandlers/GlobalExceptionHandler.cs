@@ -9,7 +9,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
         HttpContext context, Exception exception,
         CancellationToken cancellationToken)
     {
-        // [NUEVO] Body mal formado o parámetro de ruta con tipo incorrecto: es 400, no 500
+        //  Body mal formado o parámetro de ruta con tipo incorrecto
         if (exception is BadHttpRequestException)
         {
             logger.LogWarning("{ErrorCode} {Endpoint} {CorrelationId}",
@@ -30,7 +30,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
             return true;
         }
 
-        // Error inesperado: se loguea con el stack, pero no se expone al cliente
+        // se loguea con el stack, pero no se expone al cliente
       logger.LogError(exception, "{ErrorCode} {Endpoint} {CorrelationId}",
     ErrorCodes.USR_006, context.Request.Path.Value, context.TraceIdentifier);
 
