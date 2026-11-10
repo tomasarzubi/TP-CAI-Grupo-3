@@ -9,7 +9,6 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHos
         HttpContext context, Exception exception,
         CancellationToken cancellationToken)
     {
-        // [NUEVO] Body mal formado o parámetro de ruta con tipo incorrecto: es 400, no 500
         if (exception is BadHttpRequestException)
         {
             logger.LogWarning("{ErrorCode} {Endpoint} {CorrelationId}",
