@@ -25,6 +25,20 @@ namespace Users.API.Data
             """, new { email });
         }
 
+        // Sirve para buscar un usuario por su ID
+        public async Task<User?> GetByIdAsync(Guid id)
+        {
+            using var conn = CreateConnection();
+
+            return await conn.QuerySingleOrDefaultAsync<User>("""
+                SELECT id AS Id, nombre AS Nombre, apellido AS Apellido, email AS Email,
+                    password_hash AS PasswordHash, fecha_registro AS FechaRegistro,
+                    activo AS Activo, intentos_fallidos AS IntentosFallidos
+                FROM users
+                WHERE id = @id
+            """, new { id });
+        }
+
         // Sirve para el Register
         public async Task<User> CreateAsync(User user)
         {

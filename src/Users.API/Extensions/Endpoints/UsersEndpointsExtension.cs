@@ -38,22 +38,20 @@ namespace Users.API.Extensions.Endpoints
             .ProducesProblem(403)
             .ProducesProblem(500);
 
-            //  lo usan Orders y Notifications para validar que exista el usuario y que este activo
-            app.MapGet("/api/users/{id}", async (Guid id, UserService service) =>
+                        // GET /api/users/{id}
+            app.MapGet("/api/users/{id:guid}", async (Guid id, UserService service) =>
             {
-                var u = await service.GetByIdAsync(id);
-                
-                if (u == null)
-                {
-                    return Results.NotFound(new { message = "Usuario no encontrado." });
-                }
+                var user = await service.GetByIdAsync(id);
 
-                return Results.Ok(new { u.Id, u.Nombre, u.Apellido, u.Email, u.FechaRegistro, u.Activo });
+                if (user == null)
+                    return Results.NotFound();
+
+                return Results.Ok(user);
             })
             .WithTags("Users")
-            .WithSummary("Obtener usuario por ID")
-            .Produces(200)
-            .Produces(404)
+            .WithSummary("Buscar usuario por ID")
+            .Produces<User>(200)
+            .ProducesProblem(404)
             .ProducesProblem(500);
         }
     }
