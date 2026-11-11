@@ -38,15 +38,13 @@ namespace Users.API.Services
                 Nombre = req.Nombre,
                 Apellido = req.Apellido,
                 Email = req.Email,
-                PasswordHash = req.Password, 
+                PasswordHash = PasswordHasher.Hash(req.Password),
                 FechaRegistro = DateTime.UtcNow,
                 Activo = true,
                 IntentosFallidos = 0
             };
             await _repository.CreateAsync(user);
 
-            // Por seguridad, no devolvemos el password
-            user.PasswordHash = ""; 
             return user;
         }
         public async Task<User> GetByIdAsync(Guid id)
@@ -81,7 +79,7 @@ namespace Users.API.Services
                     throw new BusinessRuleException("USR-005", "Usuario bloqueado por detección de fraude.", statusCode: 403);
             }
             // 3. Contraseña incorrecta -> 401 Unauthorized (USR-003)
-            if (user.PasswordHash != req.Password)
+            if (!PasswordHasher.Verify(req.Password, user.PasswordHash))
             {
                 user.IntentosFallidos++;
                 if (user.IntentosFallidos >= 3)
@@ -93,7 +91,6 @@ namespace Users.API.Services
             }
             user.IntentosFallidos = 0;
             await _repository.UpdateAsync(user);
-            user.PasswordHash = "";
             return user;
         }
     }

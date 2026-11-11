@@ -14,7 +14,8 @@ namespace Users.API.Extensions.Endpoints
             {
                 RequestValidator.Validate(req, ErrorCodes.USR_002);              
                 var user = await service.RegisterAsync(req);
-                return Results.Created($"/api/users/{user.Id}", user);
+return Results.Created($"/api/users/{user.Id}",
+    new UserResponse(user.Id, user.Nombre, user.Apellido, user.Email, user.FechaRegistro, user.Activo));
             })
             .WithTags("Users")
             .WithSummary("Registrar nuevo usuario")
@@ -28,7 +29,8 @@ namespace Users.API.Extensions.Endpoints
             {
                 RequestValidator.Validate(req, ErrorCodes.USR_002);               
                 var user = await service.LoginAsync(req);
-                return Results.Ok(user);
+            return Results.Ok(
+                new UserResponse(user.Id, user.Nombre, user.Apellido, user.Email, user.FechaRegistro, user.Activo));
             })
             .WithTags("Users")
             .WithSummary("Autenticar usuario")
