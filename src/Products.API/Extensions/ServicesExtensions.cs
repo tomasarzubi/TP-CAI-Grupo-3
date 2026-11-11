@@ -46,8 +46,13 @@ namespace Products.API.Extensions
             services.AddSingleton<DatabaseInitializer>();
             services.AddScoped<ProductRepository>();
             services.AddScoped<ProductService>();
-            services.AddHttpClient<OrdersClient>(client => client.BaseAddress = new Uri("http://localhost:5104"));      
+            //services.AddHttpClient<OrdersClient>(client => client.BaseAddress = new Uri("http://localhost:5104"));      
 
+            //Correlation
+            services.AddHttpContextAccessor();
+            services.AddTransient<CorrelationIdHandler>();
+            services.AddHttpClient<OrdersClient>(client => client.BaseAddress = new Uri("http://localhost:5104"))
+            .AddHttpMessageHandler<CorrelationIdHandler>();
             
             services.AddExceptionHandler<NotFoundExceptionHandler>();
             services.AddExceptionHandler<BusinessRuleExceptionHandler>();
