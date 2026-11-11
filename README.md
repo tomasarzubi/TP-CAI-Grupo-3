@@ -84,18 +84,16 @@ Puertos HTTP definidos en `Properties/launchSettings.json` (perfil `http`). **So
 
 | Servicio            | Puerto HTTP | Puerto HTTPS (perfil `https`) | Base de datos | Swagger                         |
 | ------------------- | :---------: | :---------------------------: | ------------- | ------------------------------- |
-| `Users.API`         | **5102**    | 7048                          | `users.db`    | http://localhost:5102/swagger   |
+| `Users.API`         | **5102**    | 7102                          | `users.db`    | http://localhost:5102/swagger   |
 | `Orders.API`        | **5104**    | 7104                          | `orders.db`   | http://localhost:5104/swagger   |
 | `Products.API`      | **5112**    | 7048                          | `products.db` | http://localhost:5112/swagger   |
-| `Notifications.API` | **5132**    | 7132 (ver nota)               | — (en memoria)| http://localhost:5132/swagger   |
+| `Notifications.API` | **5132**    | 7132                          | — (en memoria)| http://localhost:5132/swagger   |
 | `Cart.API`          | **5231**    | 7204                          | `cart.db`     | http://localhost:5231/swagger   |
 
 Health checks (en todos los servicios): `/health`, `/health/ready` y `/health/live`. Ejemplo: `http://localhost:5102/health`. Panel visual de Health Checks UI (donde está habilitado, por ejemplo en `Cart.API` y `Users.API`): `/health-ui`.
 
 > ⚠️ **Notas sobre HTTPS** (inconsistencias del repo actual):
-> - `Users.API` y `Products.API` usan el **mismo** puerto HTTPS (7048); si se levantan los dos con el perfil `https` a la vez, uno de los dos falla.
-> - En `Notifications.API` el perfil `https` tiene los puertos invertidos (`https://localhost:5132;http://localhost:7132`).
-> - Además, las URLs entre servicios están configuradas en **HTTP**. **Recomendación: usar siempre el perfil `http`** (el que usan los comandos de abajo).
+> Las URLs entre servicios están configuradas en **HTTP**. **Recomendación: usar siempre el perfil `http`** (el que usan los comandos de abajo).
 
 ---
 
