@@ -49,7 +49,7 @@ namespace Users.API.Data
             """, user);
             return user;
         }
-       // Sirve para consultar un usuario por ID (usado por Orders y Notifications)
+       /*// Sirve para consultar un usuario por ID (usado por Orders y Notifications)
         public async Task<User?> GetByIdAsync(Guid id)
         {
             using var conn = CreateConnection();
@@ -61,6 +61,7 @@ namespace Users.API.Data
                 WHERE id = @id
             """, new { id });
         }
+        */
         // Sirve para bloquear la cuenta sumando intentos fallidos
         public async Task<bool> UpdateAsync(User user)
         {
