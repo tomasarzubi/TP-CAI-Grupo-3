@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <!-- Salida de compilacion fuera de Documents para evitar el bloqueo 0x800711C7 -->
-    <OutputPath>C:\DevBuilds\Users.API\</OutputPath>
+    <!--<OutputPath>C:\DevBuilds\Users.API\</OutputPath> -->
   </PropertyGroup>
 
   <ItemGroup>
