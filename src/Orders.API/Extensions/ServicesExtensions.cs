@@ -48,12 +48,26 @@ namespace Orders.API.Extensions
             services.AddScoped<OrderService>();
 
             // Clientes HTTP hacia Products.API y Users.API
-            services.AddHttpClient<ProductsClient>(client =>
+            /*services.AddHttpClient<ProductsClient>(client =>
             client.BaseAddress = new Uri("http://localhost:5112"));
 
             services.AddHttpClient<UsersClient>(client =>
             client.BaseAddress = new Uri("http://localhost:5102"));      
+            */
 
+            // Correlation
+
+                        // Clientes HTTP hacia Products.API y Users.API
+            services.AddHttpContextAccessor();
+            services.AddTransient<CorrelationIdHandler>();
+
+            services.AddHttpClient<ProductsClient>(client =>
+            client.BaseAddress = new Uri("http://localhost:5112"))
+            .AddHttpMessageHandler<CorrelationIdHandler>();
+
+            services.AddHttpClient<UsersClient>(client =>
+            client.BaseAddress = new Uri("http://localhost:5102"))
+            .AddHttpMessageHandler<CorrelationIdHandler>();
             
             services.AddExceptionHandler<NotFoundExceptionHandler>();
             services.AddExceptionHandler<BusinessRuleExceptionHandler>();

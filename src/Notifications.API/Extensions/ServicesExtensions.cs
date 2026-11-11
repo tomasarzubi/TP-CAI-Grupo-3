@@ -9,7 +9,13 @@ namespace Notifications.API.Extensions
         public static void AddAppServices(this IServiceCollection services)
         {
             services.AddScoped<NotificationService>();
-            services.AddHttpClient<UsersClient>(client => client.BaseAddress = new Uri("http://localhost:5102"));
+            //services.AddHttpClient<UsersClient>(client => client.BaseAddress = new Uri("http://localhost:5102"));
+
+            //Correlation
+            services.AddHttpContextAccessor();
+            services.AddTransient<CorrelationIdHandler>();
+            services.AddHttpClient<UsersClient>(client => client.BaseAddress = new Uri("http://localhost:5102"))
+            .AddHttpMessageHandler<CorrelationIdHandler>();
 
             services.AddExceptionHandler<NotFoundExceptionHandler>();
             services.AddExceptionHandler<BusinessRuleExceptionHandler>();
